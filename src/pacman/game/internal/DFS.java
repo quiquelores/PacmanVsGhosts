@@ -3,11 +3,8 @@ package pacman.game.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
-<<<<<<< HEAD
-import java.util.PriorityQueue;
-
+import java.util.HashSet;
 import pacman.game.Game;
-import sun.misc.Queue;
 import pacman.game.Constants.MOVE;
 
 /*
@@ -37,16 +34,19 @@ public class DFS
 		}
 	}
 
-	public synchronized int[] computePathDFS(int s, int t, MOVE lastMoveMade, Game game)
+	public synchronized int[] computePathDFS(int s, int[] targets, MOVE lastMoveMade, Game game)
     {
 		N start=graph[s];
-		N target=graph[t];
+		N currentNode = null;
+		HashSet<N> targetsN = new HashSet<N>();
+		for(int i = 0; i < targets.length; i++){
+			targetsN.add(graph[i]);
+		}
 
         ArrayList<N> open = new ArrayList<N>();
         ArrayList<N> closed = new ArrayList<N>();
 
         start.g = 0;
-        start.h = game.getShortestPathDistance(start.index, target.index);
 
         start.reached=lastMoveMade;
 
@@ -54,15 +54,15 @@ public class DFS
 
         while(!open.isEmpty())
         {
-            N currentNode = open.remove(open.size()-1);
+            currentNode = open.remove(open.size()-1);
             closed.add(currentNode);
 
-            if (currentNode.isEqual(target))
+            if (targetsN.contains(currentNode))
                 break;
 
             for(E next : currentNode.adj)
             {
-            	if(next.move!=currentNode.reached.opposite()&& !open.contains(next.node) && !closed.contains(next.node))
+            	if(next.move!=currentNode.reached.opposite() && !open.contains(next.node) && !closed.contains(next.node))
             	{
             		next.node.parent = currentNode;
             		next.node.reached=next.move;
@@ -72,13 +72,12 @@ public class DFS
             }
         }
 
-        return extractPath(target);
+        return extractPath(currentNode);
     }
 
-
-	public synchronized int[] computePathDFS(int s, int t, Game game)
+	public synchronized int[] computePathDFS(int s, int[] targets, Game game)
     {
-		return computePathDFS(s, t, MOVE.NEUTRAL, game);
+		return computePathDFS(s, targets, MOVE.NEUTRAL, game);
     }
 
     private synchronized int[] extractPath(N target)
