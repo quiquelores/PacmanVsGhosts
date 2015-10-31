@@ -1,11 +1,7 @@
 package pacman.entries.pacman;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
-
 import pacman.controllers.Controller;
-import pacman.game.Constants.DM;
-import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.internal.DFS;
 import pacman.game.Game;
@@ -22,7 +18,10 @@ public class PacmanDFS extends Controller<MOVE>
 
 	public MOVE getMove(Game game, long timeDue)
 	{
-		if(path.isEmpty()){
+		if(game.wasPacManEaten()){
+			path = new ArrayList<Integer>();
+		}
+		while(path.isEmpty()){
 			DFS graph = new DFS();
 			graph.createGraph(game.getCurrentMaze().graph);
 
@@ -44,14 +43,12 @@ public class PacmanDFS extends Controller<MOVE>
 			for(int i=0;i<targetsArray.length;i++)
 				targetsArray[i]=targets.get(i);
 
-			int locNearestPill = game.getClosestNodeIndexFromNodeIndex(game.getPacmanCurrentNodeIndex(), targetsArray, DM.PATH);
-			int[] bestPath = graph.computePathDFS(game.getPacmanCurrentNodeIndex(), locNearestPill, game);
+			int[] bestPath = graph.computePathDFS(game.getPacmanCurrentNodeIndex(), targetsArray, game);
 
 			for(int i = 1; i < bestPath.length; i++){
 				path.add(bestPath[i]);
 			}
 		}
-
 		myMove = game.getMoveToMakeToReachDirectNeighbour(game.getPacmanCurrentNodeIndex(), path.remove(0));
 
 		return myMove;
