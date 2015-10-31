@@ -11,52 +11,37 @@ import sun.misc.Queue;
 import pacman.game.Constants.MOVE;
 
 /*
- * This class is used to compute the shortest path for the ghosts: as these may not reverse, one cannot use 
- * a simple look-up table. Instead, we use the pre-computed shortest path distances as an admissable
- * heuristic. Although AStar needs to be run every time a path is to be found, it is very quick and does
- * not expand too many nodes beyond those on the optimal path.
-=======
-
-import pacman.game.Game;
-import pacman.game.Constants.MOVE;
-
-/*
  * This class is used to compute A path to the given target using Depth First Search
->>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
  */
 public class DFS
 {
 	private N[] graph;
-	
+
 	public void createGraph(Node[] nodes)
 	{
 		graph=new N[nodes.length];
-		
+
 		//create graph
 		for(int i=0;i<nodes.length;i++)
 			graph[i]=new N(nodes[i].nodeIndex);
-		
+
 		//add neighbours
 		for(int i=0;i<nodes.length;i++)
-		{	
+		{
 			EnumMap<MOVE,Integer> neighbours=nodes[i].neighbourhood;
 			MOVE[] moves=MOVE.values();
-			
+
 			for(int j=0;j<moves.length;j++)
 				if(neighbours.containsKey(moves[j]))
-					graph[i].adj.add(new E(graph[neighbours.get(moves[j])],moves[j],1));	
+					graph[i].adj.add(new E(graph[neighbours.get(moves[j])],moves[j],1));
 		}
 	}
-	
-<<<<<<< HEAD
-	public synchronized int[] computePathsAStar(int s, int t, MOVE lastMoveMade, Game game)
-=======
+
 	public synchronized int[] computePathDFS(int s, int t, MOVE lastMoveMade, Game game)
->>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
-    {	
+    {
 		N start=graph[s];
 		N target=graph[t];
-		
+
         ArrayList<N> open = new ArrayList<N>();
         ArrayList<N> closed = new ArrayList<N>();
 
@@ -64,73 +49,36 @@ public class DFS
         start.h = game.getShortestPathDistance(start.index, target.index);
 
         start.reached=lastMoveMade;
-        
+
         open.add(start);
 
         while(!open.isEmpty())
         {
             N currentNode = open.remove(open.size()-1);
             closed.add(currentNode);
-            
+
             if (currentNode.isEqual(target))
                 break;
 
             for(E next : currentNode.adj)
             {
-<<<<<<< HEAD
-            	if(next.move!=currentNode.reached.opposite())
-            	{
-	                double currentDistance = next.cost;
-	
-	                if (!open.contains(next.node) && !closed.contains(next.node))
-	                {
-	                    //next.node.g = currentDistance + currentNode.g;
-	                    //next.node.h = game.getShortestPathDistance(next.node.index, target.index);
-	                    next.node.parent = currentNode;
-	                    
-	                    next.node.reached=next.move;
-	
-	                    open.add(next.node);
-	                }
-	                /*else if (currentDistance + currentNode.g < next.node.g)
-	                {
-	                    next.node.g = currentDistance + currentNode.g;
-	                    next.node.parent = currentNode;
-	                    
-	                    next.node.reached=next.move;
-	
-	                    if (open.contains(next.node))
-	                        open.remove(next.node);
-	
-	                    if (closed.contains(next.node))
-	                        closed.remove(next.node);
-	
-	                    open.add(next.node);
-	                }*/
-=======
             	if(next.move!=currentNode.reached.opposite()&& !open.contains(next.node) && !closed.contains(next.node))
-            	{	
+            	{
             		next.node.parent = currentNode;
             		next.node.reached=next.move;
 
-            		open.add(next.node);   
->>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
+            		open.add(next.node);
 	            }
             }
         }
 
         return extractPath(target);
     }
-	
-<<<<<<< HEAD
-	public synchronized int[] computePathsAStar(int s, int t, Game game)
-    {	
-		return computePathsAStar(s, t, MOVE.NEUTRAL, game);
-=======
+
+
 	public synchronized int[] computePathDFS(int s, int t, Game game)
-    {	
+    {
 		return computePathDFS(s, t, MOVE.NEUTRAL, game);
->>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
     }
 
     private synchronized int[] extractPath(N target)
@@ -144,17 +92,17 @@ public class DFS
             route.add(current.parent.index);
             current = current.parent;
         }
-        
+
         Collections.reverse(route);
 
         int[] routeArray=new int[route.size()];
-        
+
         for(int i=0;i<routeArray.length;i++)
         	routeArray[i]=route.get(i);
-        
+
         return routeArray;
     }
-    
+
     public void resetGraph()
     {
     	for(N node : graph)
@@ -165,64 +113,4 @@ public class DFS
     		node.reached=null;
     	}
     }
-<<<<<<< HEAD
 }
-
-/*class N implements Comparable<N>
-{
-    public N parent;
-    public double g, h;
-    public boolean visited = false;
-    public ArrayList<E> adj;
-    public int index;
-    public MOVE reached=null;
-
-    public N(int index)
-    {
-        adj = new ArrayList<E>();
-        this.index=index;
-    }
-
-    public N(double g, double h)
-    {
-        this.g = g;
-        this.h = h;
-    }
-
-    public boolean isEqual(N another)
-    {
-        return index == another.index;
-    }
-
-    public String toString()
-    {
-        return ""+index;
-    }
-
-	public int compareTo(N another)
-	{
-      if ((g + h) < (another.g + another.h))
-    	  return -1;
-      else  if ((g + h) > (another.g + another.h))
-    	  return 1;
-		
-		return 0;
-	}
-}*/
-
-/*class E
-{
-	public N node;
-	public MOVE move;
-	public double cost;
-	
-	public E(N node,MOVE move,double cost)
-	{
-		this.node=node;
-		this.move=move;
-		this.cost=cost;
-	}
-}*/
-=======
-}
->>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
