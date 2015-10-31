@@ -18,23 +18,23 @@ import pacman.game.internal.BFS;
 public class MyGhosts extends Controller<EnumMap<GHOST,MOVE>>
 {
 	private EnumMap<GHOST, MOVE> myMoves=new EnumMap<GHOST, MOVE>(GHOST.class);
-	
+
 	public EnumMap<GHOST, MOVE> getMove(Game game, long timeDue)
 	{
 		myMoves.clear();
-		
+
 		//Place your game logic here to play the game as the ghosts
 		for(GHOST ghost : GHOST.values()){
 			if(game.doesGhostRequireAction(ghost)){	//if it requires an action
 
 				BFS graph = new BFS();
 				graph.createGraph(game.getCurrentMaze().graph);
-			
-				int[] bestPath = graph.computePathsAStar(game.getGhostCurrentNodeIndex(ghost), game.getPacmanCurrentNodeIndex(), game);
+
+				int[] bestPath = graph.computePathBFS(game.getGhostCurrentNodeIndex(ghost), game.getPacmanCurrentNodeIndex(), game);
 				myMoves.put(ghost, game.getMoveToMakeToReachDirectNeighbour(game.getGhostCurrentNodeIndex(ghost), bestPath[0]));
 			}
 		}
-		
+
 		return myMoves;
 	}
 }

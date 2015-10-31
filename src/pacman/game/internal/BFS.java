@@ -39,7 +39,11 @@ public class BFS
 		}
 	}
 	
+<<<<<<< HEAD
 	public synchronized int[] computePathsAStar(int s, int t, MOVE lastMoveMade, Game game)
+=======
+	public synchronized int[] computePathBFS(int s, int t, MOVE lastMoveMade, Game game)
+>>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
     {	
 		N start=graph[s];
 		N target=graph[t];
@@ -64,6 +68,7 @@ public class BFS
 
             for(E next : currentNode.adj)
             {
+<<<<<<< HEAD
             	if(next.move!=currentNode.reached.opposite())
             	{
 	                double currentDistance = next.cost;
@@ -94,15 +99,31 @@ public class BFS
 	                    open.add(next.node);
 	                }*/
 	            }
+=======
+            	if(next.move!=currentNode.reached.opposite()&& !open.contains(next.node) && !closed.contains(next.node))
+            	{
+            		next.node.parent = currentNode;
+            		next.node.reached=next.move;
+
+            		open.add(next.node);
+
+            	}
+>>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
             }
         }
 
         return extractPath(target);
     }
 	
+<<<<<<< HEAD
 	public synchronized int[] computePathsAStar(int s, int t, Game game)
     {	
 		return computePathsAStar(s, t, MOVE.NEUTRAL, game);
+=======
+	public synchronized int[] computePathBFS(int s, int t, Game game)
+    {	
+		return computePathBFS(s, t, MOVE.NEUTRAL, game);
+>>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
     }
 
     private synchronized int[] extractPath(N target)
@@ -137,6 +158,7 @@ public class BFS
     		node.reached=null;
     	}
     }
+<<<<<<< HEAD
 }
 
 /*class N implements Comparable<N>
@@ -194,3 +216,6 @@ public class BFS
 		this.cost=cost;
 	}
 }*/
+=======
+}
+>>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f

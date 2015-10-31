@@ -3,6 +3,7 @@ package pacman.game.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+<<<<<<< HEAD
 import java.util.PriorityQueue;
 
 import pacman.game.Game;
@@ -14,6 +15,14 @@ import pacman.game.Constants.MOVE;
  * a simple look-up table. Instead, we use the pre-computed shortest path distances as an admissable
  * heuristic. Although AStar needs to be run every time a path is to be found, it is very quick and does
  * not expand too many nodes beyond those on the optimal path.
+=======
+
+import pacman.game.Game;
+import pacman.game.Constants.MOVE;
+
+/*
+ * This class is used to compute A path to the given target using Depth First Search
+>>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
  */
 public class DFS
 {
@@ -39,7 +48,11 @@ public class DFS
 		}
 	}
 	
+<<<<<<< HEAD
 	public synchronized int[] computePathsAStar(int s, int t, MOVE lastMoveMade, Game game)
+=======
+	public synchronized int[] computePathDFS(int s, int t, MOVE lastMoveMade, Game game)
+>>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
     {	
 		N start=graph[s];
 		N target=graph[t];
@@ -64,6 +77,7 @@ public class DFS
 
             for(E next : currentNode.adj)
             {
+<<<<<<< HEAD
             	if(next.move!=currentNode.reached.opposite())
             	{
 	                double currentDistance = next.cost;
@@ -93,6 +107,14 @@ public class DFS
 	
 	                    open.add(next.node);
 	                }*/
+=======
+            	if(next.move!=currentNode.reached.opposite()&& !open.contains(next.node) && !closed.contains(next.node))
+            	{	
+            		next.node.parent = currentNode;
+            		next.node.reached=next.move;
+
+            		open.add(next.node);   
+>>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
 	            }
             }
         }
@@ -100,9 +122,15 @@ public class DFS
         return extractPath(target);
     }
 	
+<<<<<<< HEAD
 	public synchronized int[] computePathsAStar(int s, int t, Game game)
     {	
 		return computePathsAStar(s, t, MOVE.NEUTRAL, game);
+=======
+	public synchronized int[] computePathDFS(int s, int t, Game game)
+    {	
+		return computePathDFS(s, t, MOVE.NEUTRAL, game);
+>>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
     }
 
     private synchronized int[] extractPath(N target)
@@ -137,6 +165,7 @@ public class DFS
     		node.reached=null;
     	}
     }
+<<<<<<< HEAD
 }
 
 /*class N implements Comparable<N>
@@ -194,3 +223,6 @@ public class DFS
 		this.cost=cost;
 	}
 }*/
+=======
+}
+>>>>>>> d59774428c4ddbf7d4ce9a2b64f51eafd9499f7f
