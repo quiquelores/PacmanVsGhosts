@@ -1,7 +1,13 @@
 package pacman.entries.pacman;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
+
 import pacman.controllers.Controller;
+import pacman.game.Constants.DM;
+import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
+import pacman.game.internal.BFS;
 import pacman.game.Game;
 
 /*
@@ -17,6 +23,39 @@ public class MyPacMan extends Controller<MOVE>
 	{
 		//Place your game logic here to play the game as Ms Pac-Man
 		
+		BFS graph = new BFS();
+		graph.createGraph(game.getCurrentMaze().graph);
+		
+		int[] pills=game.getPillIndices();
+		int[] powerPills=game.getPowerPillIndices();		
+		
+		ArrayList<Integer> targets=new ArrayList<Integer>();
+		
+		for(int i=0;i<pills.length;i++)					//check which pills are available			
+			if(game.isPillStillAvailable(i))
+				targets.add(pills[i]);
+		
+		for(int i=0;i<powerPills.length;i++)			//check with power pills are available
+			if(game.isPowerPillStillAvailable(i))
+				targets.add(powerPills[i]);				
+		
+		int[] targetsArray=new int[targets.size()];		//convert from ArrayList to array
+		
+		for(int i=0;i<targetsArray.length;i++)
+			targetsArray[i]=targets.get(i);
+		
+		//return the next direction once the closest target has been identified
+		//return game.getNextMoveTowardsTarget(current,game.getClosestNodeIndexFromNodeIndex(current,targetsArray,DM.PATH),DM.PATH);
+		
+		int locNearestPill = game.getClosestNodeIndexFromNodeIndex(game.getPacmanCurrentNodeIndex(), targetsArray, DM.PATH);
+		int[] bestPath = graph.computePathsAStar(game.getPacmanCurrentNodeIndex(), locNearestPill, game);
+		System.out.println(game.getPacmanCurrentNodeIndex());
+		System.out.println(locNearestPill);
+		for(int i = 0; i < bestPath.length; i++){
+			System.out.println(i+ " " + bestPath[i]);
+		}
+		myMove = game.getMoveToMakeToReachDirectNeighbour(game.getPacmanCurrentNodeIndex(), bestPath[1]);
+		System.exit(-1);
 		return myMove;
 	}
 }
