@@ -22,7 +22,6 @@ import pacman.controllers.examples.RandomNonRevPacMan;
 import pacman.controllers.examples.RandomPacMan;
 import pacman.controllers.examples.StarterGhosts;
 import pacman.controllers.examples.StarterPacMan;
-import pacman.entries.ghosts.MyGhosts;
 import pacman.entries.pacman.PacmanBFS;
 import pacman.entries.pacman.PacmanDFS;
 import pacman.game.Game;
