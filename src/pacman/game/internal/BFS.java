@@ -3,6 +3,7 @@ package pacman.game.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.PriorityQueue;
 
 import pacman.game.Game;
@@ -37,27 +38,30 @@ public class BFS
 	}
 
 
-	public synchronized int[] computePathBFS(int s, int t, MOVE lastMoveMade, Game game)
+	public synchronized int[] computePathBFS(int s, int[] targets, MOVE lastMoveMade, Game game)
     {
 		N start=graph[s];
-		N target=graph[t];
+		N currentNode = null;
+		HashSet<N> targetsN = new HashSet<N>();
+		for(int i = 0; i < targets.length; i++){
+			targetsN.add(graph[targets[i]]);
+		}
 
         ArrayList<N> open = new ArrayList<N>();
         ArrayList<N> closed = new ArrayList<N>();
 
         start.g = 0;
-        start.h = game.getShortestPathDistance(start.index, target.index);
-
+        
         start.reached=lastMoveMade;
 
         open.add(start);
 
         while(!open.isEmpty())
         {
-            N currentNode = open.remove(0);
+        	currentNode = open.remove(0);
             closed.add(currentNode);
 
-            if (currentNode.isEqual(target))
+            if (targetsN.contains(currentNode))
                 break;
 
             for(E next : currentNode.adj)
@@ -73,12 +77,12 @@ public class BFS
             }
         }
 
-        return extractPath(target);
+        return extractPath(currentNode);
     }
 
-	public synchronized int[] computePathBFS(int s, int t, Game game)
+	public synchronized int[] computePathBFS(int s, int[] targets, Game game)
     {
-		return computePathBFS(s, t, MOVE.NEUTRAL, game);
+		return computePathBFS(s, targets, MOVE.NEUTRAL, game);
     }
 
     private synchronized int[] extractPath(N target)

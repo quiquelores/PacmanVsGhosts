@@ -45,8 +45,7 @@ public class PacmanBFS extends Controller<MOVE>
 			targetsArray[i]=targets.get(i);
 
 
-		int locNearestPill = game.getClosestNodeIndexFromNodeIndex(game.getPacmanCurrentNodeIndex(), targetsArray, DM.PATH);
-		int[] bestPath = graph.computePathBFS(game.getPacmanCurrentNodeIndex(), locNearestPill, game);
+		int[] bestPath = graph.computePathBFS(game.getPacmanCurrentNodeIndex(), targetsArray, game);
 
 		myMove = game.getMoveToMakeToReachDirectNeighbour(game.getPacmanCurrentNodeIndex(), bestPath[1]);
 		return myMove;
