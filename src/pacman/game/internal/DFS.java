@@ -34,20 +34,20 @@ public class DFS
 		}
 	}
 
-	public synchronized int[] computePathDFS(int s, int[] targets, MOVE lastMoveMade, Game game)
+	public synchronized int[] computePathDFS(int s, int[] targets, MOVE lastMoveMade, Game game, int depth)
     {
 		N start=graph[s];
 		N currentNode = null;
+
 		HashSet<N> targetsN = new HashSet<N>();
 		for(int i = 0; i < targets.length; i++){
-			targetsN.add(graph[i]);
+			targetsN.add(graph[targets[i]]);
 		}
 
         ArrayList<N> open = new ArrayList<N>();
         ArrayList<N> closed = new ArrayList<N>();
 
         start.g = 0;
-
         start.reached=lastMoveMade;
 
         open.add(start);
@@ -62,23 +62,33 @@ public class DFS
 
             for(E next : currentNode.adj)
             {
+            	double currentDistance = next.cost;
+
             	if(next.move!=currentNode.reached.opposite() && !open.contains(next.node) && !closed.contains(next.node))
             	{
+                    next.node.g = currentDistance + currentNode.g;
             		next.node.parent = currentNode;
             		next.node.reached=next.move;
 
-            		open.add(next.node);
+            		if(next.node.g < depth){
+            			open.add(next.node);
+            		}
 	            }
             }
         }
+        if(targetsN.contains(currentNode)) return extractPath(currentNode);
 
-        return extractPath(currentNode);
+        return new int[0];
     }
 
 	public synchronized int[] computePathDFS(int s, int[] targets, Game game)
     {
-		return computePathDFS(s, targets, MOVE.NEUTRAL, game);
+		return computePathDFS(s, targets, MOVE.NEUTRAL, game, Integer.MAX_VALUE);
     }
+	public synchronized int[] computePathDFS(int s, int[] targets, Game game, int depth)
+	{
+		return computePathDFS(s, targets, MOVE.NEUTRAL, game, depth);
+	}
 
     private synchronized int[] extractPath(N target)
     {
