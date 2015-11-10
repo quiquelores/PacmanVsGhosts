@@ -3,7 +3,7 @@ package pacman.entries.pacman;
 import java.util.ArrayList;
 import pacman.controllers.Controller;
 import pacman.game.Constants.MOVE;
-import pacman.game.internal.DFS;
+import pacman.game.internal.TreeSearch;
 import pacman.game.Game;
 
 /*
@@ -22,7 +22,7 @@ public class PacmanDFS extends Controller<MOVE>
 			path = new ArrayList<Integer>();
 		}
 		while(path.isEmpty()){
-			DFS graph = new DFS();
+			TreeSearch graph = new TreeSearch();
 			graph.createGraph(game.getCurrentMaze().graph);
 
 			int[] pills=game.getPillIndices();

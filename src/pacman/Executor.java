@@ -37,6 +37,8 @@ import static pacman.game.Constants.*;
 @SuppressWarnings("unused")
 public class Executor
 {
+	public static Controller<EnumMap<GHOST,MOVE>> ghostAI;
+	
 	/**
 	 * The main method. Several options are listed - simply remove comments to use the option you want.
 	 *
@@ -67,12 +69,13 @@ public class Executor
 //		exec.runGameTimed(new HumanController(new KeyBoardInput()),new StarterGhosts(),visual);
 //		exec.runGameTimed(new HumanController(new KeyBoardInput()),new MyGhosts(),visual);
 //		exec.runGameTimed(new MyPacMan(),new StarterGhosts(),visual);
+
+		// Our Pacman Algorithms
+		exec.runGameTimed(new PacmanBFS(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanDFS(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanIterativeDeepening(),new StarterGhosts(),visual);
-		exec.runGameTimed(new PacmanHillclimber(),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanHillclimber(),new StarterGhosts(),visual);
 
-//		exec.runGameTimed(new PacmanBFS(),new StarterGhosts(),visual);
-//		exec.runGameTimed(new PacmanDFS(),new StarterGhosts(),visual);
 		//*/
 
 		/*
@@ -167,6 +170,7 @@ public class Executor
     public void runGameTimed(Controller<MOVE> pacManController,Controller<EnumMap<GHOST,MOVE>> ghostController,boolean visual)
 	{
 		Game game=new Game(0);
+		ghostAI = ghostController;
 
 		GameView gv=null;
 
