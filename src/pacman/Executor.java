@@ -71,10 +71,11 @@ public class Executor
 //		exec.runGameTimed(new MyPacMan(),new StarterGhosts(),visual);
 
 		// Our Pacman Algorithms
-		exec.runGameTimed(new PacmanBFS(),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanBFS(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanDFS(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanIterativeDeepening(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanHillclimber(),new StarterGhosts(),visual);
+		exec.runGameTimed(new PacmanSimulatedAnnealing(),new StarterGhosts(),visual);
 
 		//*/
 
