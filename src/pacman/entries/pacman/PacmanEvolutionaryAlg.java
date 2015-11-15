@@ -3,11 +3,7 @@ package pacman.entries.pacman;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import pacman.Executor;
 import pacman.controllers.Controller;
-import pacman.controllers.examples.StarterGhosts;
-import pacman.game.Constants.DM;
-import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 import pacman.game.internal.*;
