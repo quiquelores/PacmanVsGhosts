@@ -30,6 +30,7 @@ public class TreeNode implements Comparable<TreeNode>
     	Game game = this.gameState.copy();
     	game.advanceGame(move, Executor.ghostAI.getMove());
     	TreeNode next = new TreeNode(game);
+    	next.parent = this;
     	return next;
     }
 
