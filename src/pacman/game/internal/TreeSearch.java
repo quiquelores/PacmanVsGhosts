@@ -159,18 +159,30 @@ public class TreeSearch {
 }
 
 
-class TreeNode
-{
-	public Game gameState;
-	public int index;
-	public EnumMap<MOVE, TreeNode> neighbors = new EnumMap<MOVE, TreeNode>(MOVE.class);
-	public double g = 0;
-	public double h = 0;
-	public TreeNode parent = null;
-	public MOVE reachedBy = null;
-
-    public TreeNode(int index)
-    {
-        this.index=index;
-    }
-}
+//public class TreeNode
+//{
+//	public Game gameState;
+//	public int index;
+//	public EnumMap<MOVE, TreeNode> neighbors = new EnumMap<MOVE, TreeNode>(MOVE.class);
+//	public double g = 0;
+//	public double h = 0;
+//	public TreeNode parent = null;
+//	public MOVE reachedBy = null;
+//
+//    public TreeNode(int index)
+//    {
+//        this.index=index;
+//    }
+//    
+//    public TreeNode(Game game){
+//    	this.gameState = game;
+//    	this.index = game.getPacmanCurrentNodeIndex();
+//    	this.reachedBy = game.getPacmanLastMoveMade();    	
+//    }
+//    public TreeNode evolve(MOVE move){
+//    	Game game = this.gameState.copy();
+//    	game.advanceGame(move, Executor.ghostAI.getMove());
+//    	TreeNode next = new TreeNode(game);
+//    	return next;
+//    }
+//}
