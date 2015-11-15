@@ -7,6 +7,7 @@ import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
+import pacman.game.internal.StateEvaluator;
 
 /*
  * This is the class you need to modify for your entry. In particular, you need to
@@ -22,14 +23,13 @@ public class PacmanSimulatedAnnealing extends Controller<MOVE>
 		int currBestEval = Integer.MIN_VALUE;
 
 		MOVE[] possibleMoves = game.getPossibleMoves(game.getPacmanCurrentNodeIndex());
-		System.out.println("CHECKING NEW MOVES");
 
 		for(MOVE move : possibleMoves){
 
 			Game gameCopy = game.copy();
 			gameCopy.advanceGame(move, Executor.ghostAI.getMove());
 
-			int stateScore = evalGameState(gameCopy);
+			int stateScore = StateEvaluator.evalGameState(gameCopy);
 			double time = gameCopy.getCurrentLevelTime();
 
 			if(stateScore>currBestEval){
@@ -41,24 +41,5 @@ public class PacmanSimulatedAnnealing extends Controller<MOVE>
 			}
 		}
 		return myMove;
-	}
-	
-	private int evalGameState(Game game){
-		
-
-		if(game.wasPacManEaten()) return Integer.MIN_VALUE;
-
-		int score = game.getScore();
-
-		//having edible ghosts will lead to a higher score. being close to them will lead to a higher score if edible, and to a lower score if they're not edible.
-		for(GHOST ghost: GHOST.values()){
-			if(game.isGhostEdible(ghost)){
-				score += 50;
-				score -= game.getDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(ghost), DM.PATH);
-			} else {
-				score += game.getDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(ghost), DM.PATH);
-			}
-		}
-		return score;
 	}
 }

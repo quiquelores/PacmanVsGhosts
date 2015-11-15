@@ -224,6 +224,7 @@ public class TreeSearch {
 }
 
 
+<<<<<<< 747826ffe3e90bc24d02873ab013935c49536f89
 //Class adapted from AStar.java
 class TreeNode implements Comparable<TreeNode>
 {
@@ -238,6 +239,17 @@ class TreeNode implements Comparable<TreeNode>
     public TreeNode(int index)
     {
         this.index=index;
+    }
+    public TreeNode(Game game){
+    	this.gameState = game;
+    	this.index = game.getPacmanCurrentNodeIndex();
+    	this.reachedBy = game.getPacmanLastMoveMade();    	
+    }
+    public TreeNode evolve(MOVE move){
+    	Game game = this.gameState.copy();
+    	game.advanceGame(move, Executor.ghostAI.getMove());
+    	TreeNode next = new TreeNode(game);
+    	return next;
     }
     
     public double f() {
