@@ -1,14 +1,16 @@
 package pacman.game.internal;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Dictionary;
 import java.util.Collections;
 import java.util.EnumMap;
-//import java.util.HashSet;
-//import java.util.Map;
-//import java.util.PriorityQueue;
+import java.util.PriorityQueue;
 
 import pacman.game.Game;
 import pacman.Executor;
+import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 
 
@@ -39,16 +41,119 @@ public class TreeSearch {
 	
 	
 	// BFS implementation
-	private synchronized int[] computePathBFS(int s, int[] targets, MOVE lastMoveMade, Game game)
+	public synchronized int[] computePathBFS(int s, Game game, int depth)
     {
 		ArrayList<TreeNode> open = new ArrayList<TreeNode>();
+		ArrayList<TreeNode> closed = new ArrayList<TreeNode>();
 		TreeNode start = graph[s];
 		start.gameState = game.copy();
 		start.reachedBy = MOVE.NEUTRAL;
 		open.add(start);
 		TreeNode current = null;
 		while (!open.isEmpty()) {
+			
 			current = open.remove(0);
+			closed.add(current);
+			
+			if (current.gameState.getScore() > game.getScore()) {
+				break;
+			}
+			
+			for (MOVE move : current.neighbors.keySet()) {
+				if(move != current.reachedBy.opposite()) {
+					TreeNode child = current.neighbors.get(move);
+					if (closed.contains(child)) {
+						continue;
+					}
+					child.g = current.g + 1;
+					if(child.g < depth){
+						child.parent = current;
+						child.reachedBy = move;
+						Game gameState = current.gameState.copy();
+						gameState.advanceGame(move, Executor.ghostAI.getMove(gameState, -1));
+						if (!gameState.wasPacManEaten()) {
+							child.gameState = gameState;
+							open.add(child);
+						}
+					}
+				}
+			}
+		}
+
+        return extractPath(current);
+    }
+	
+	
+	// DFS implementation
+	public synchronized int[] computePathDFS(int s, Game game, int depth)
+    {
+		ArrayList<TreeNode> open = new ArrayList<TreeNode>();
+		ArrayList<TreeNode> closed = new ArrayList<TreeNode>();
+		TreeNode start = graph[s];
+		start.gameState = game.copy();
+		start.reachedBy = MOVE.NEUTRAL;
+		open.add(start);
+		TreeNode current = null;
+		Boolean foundSolution = false;
+		while (!open.isEmpty()) {
+			
+			current = open.remove(open.size() - 1);
+			closed.add(current);
+			
+			if (current.gameState.getScore() > game.getScore()) {
+				foundSolution = true;
+				break;
+			}
+			
+			for (MOVE move : current.neighbors.keySet()) {
+				if(move != current.reachedBy.opposite()) {
+					TreeNode child = current.neighbors.get(move);
+					if (closed.contains(child)) {
+						continue;
+					}
+					child.g = current.g + 1;
+					if(child.g < depth){
+						child.parent = current;
+						child.reachedBy = move;
+						Game gameState = current.gameState.copy();
+						gameState.advanceGame(move, Executor.ghostAI.getMove(gameState, -1));
+						if (!gameState.wasPacManEaten()) {
+							child.gameState = gameState;
+							open.add(child);
+						}
+					}
+				}
+			}
+		}
+
+        if(foundSolution) {
+        	return extractPath(current);
+        }
+        else {
+        	return new int[0];
+        }
+    }
+	
+	// A* implementation
+	public synchronized int[] computePathAStar(int s, Game game, int maxIterations)
+    {
+		PriorityQueue<TreeNode> open = new PriorityQueue<TreeNode>();
+		HashMap<Integer, TreeNode> closed = new HashMap<Integer, TreeNode>();
+		TreeNode start = graph[s];
+		start.gameState = game.copy();
+		start.reachedBy = MOVE.NEUTRAL;
+		open.add(start);
+		TreeNode current = null;
+		int count = 0;
+		while (!open.isEmpty()) {
+
+			current = open.poll();
+			closed.put(current.index, current);
+			
+			count += 1;
+			if (count > maxIterations) {
+				break;
+			}
 			
 			if (current.gameState.getScore() > game.getScore()) {
 				break;
@@ -64,79 +169,39 @@ public class TreeSearch {
 					gameState.advanceGame(move, Executor.ghostAI.getMove(gameState, -1));
 					if (!gameState.wasPacManEaten()) {
 						child.gameState = gameState;
-						open.add(child);
+						int numActivePills = gameState.getNumberOfActivePills();
+						if (numActivePills > game.getNumberOfActivePills()) {
+							numActivePills = 0;
+						}
+						child.h = numActivePills;
+						if (closed.containsKey(child.index) && closed.get(child.index).f() > child.f()) {
+							closed.remove(child.index);
+							open.add(child);
+						}
+						else if (!closed.containsKey(child.index) && !open.contains(child)) {
+							open.add(child);
+						}
 					}
 				}
 			}
 		}
-
         return extractPath(current);
     }
 	
 	
-	// DFS implementation
-	private synchronized int[] computePathDFS(int s, int[] targets, MOVE lastMoveMade, Game game, int depth)
-    {
-		ArrayList<TreeNode> open = new ArrayList<TreeNode>();
+	public synchronized HashMap<MOVE, Game> getImmediateNextGameStates(int s, Game game)
+	{
 		TreeNode start = graph[s];
-		start.gameState = game.copy();
-		start.reachedBy = MOVE.NEUTRAL;
-		open.add(start);
-		TreeNode current = null;
-		Boolean foundSolution = false;
-		while (!open.isEmpty()) {
-			current = open.remove(open.size() - 1);
-			
-			if (current.gameState.getScore() > game.getScore()) {
-				foundSolution = true;
-				break;
-			}
-			
-			for (MOVE move : current.neighbors.keySet()) {
-				if(move != current.reachedBy.opposite()) {
-					TreeNode child = current.neighbors.get(move);
-					child.g = current.g + 1;
-					if(child.g < depth){
-						child.parent = current;
-						child.reachedBy = move;
-						Game gameState = current.gameState.copy();
-						gameState.advanceGame(move, Executor.ghostAI.getMove(gameState, -1));
-						child.gameState = gameState;
-						open.add(child);
-					}
-				}
-			}
+		HashMap<MOVE, Game> nextStates = new HashMap<MOVE, Game>();
+		
+		for (MOVE move : start.neighbors.keySet()) {
+			Game gameState = game.copy();
+			gameState.advanceGame(move, Executor.ghostAI.getMove(gameState, -1));
+			nextStates.put(move, gameState);
 		}
-
-        if(foundSolution) {
-        	return extractPath(current);
-        }
-        else {
-        	return new int[0];
-        }
-    }
-
-	
-	// BFS function call
-	public synchronized int[] computePathBFS(int s, int[] targets, Game game)
-    {
-		return computePathBFS(s, targets, MOVE.NEUTRAL, game);
-    }
-	
-	
-	// DFS function call
-	public synchronized int[] computePathDFS(int s, int[] targets, Game game)
-    {
-		return computePathDFS(s, targets, MOVE.NEUTRAL, game, Integer.MAX_VALUE);
-    }
-	
-	
-	// Depth-limited DFS function call
-	public synchronized int[] computePathDFS(int s, int[] targets, Game game, int depth)
-    {
-		return computePathDFS(s, targets, MOVE.NEUTRAL, game, depth);
-    }
-	
+		
+        return nextStates;
+	}
 	
 	// Function adapted from AStar.java
 	private synchronized int[] extractPath(TreeNode target)
@@ -159,7 +224,8 @@ public class TreeSearch {
 }
 
 
-class TreeNode
+//Class adapted from AStar.java
+class TreeNode implements Comparable<TreeNode>
 {
 	public Game gameState;
 	public int index;
@@ -172,5 +238,25 @@ class TreeNode
     public TreeNode(int index)
     {
         this.index=index;
+    }
+    
+    public double f() {
+    	return g + h;
+    }
+    
+    public boolean isEqual(TreeNode other)
+    {
+        return index == other.index;
+    }
+    
+    public int compareTo(TreeNode other)
+    {
+		if (f() < other.f()) {
+			return -1;
+		}
+		else if (f() > other.f()) {
+			return 1;
+		}
+		return 0;
     }
 }

@@ -10,7 +10,7 @@ import pacman.game.Constants.MOVE;
 import pacman.game.internal.TreeSearch;
 import pacman.game.Game;
 
-public class PacmanBFS extends Controller<MOVE>
+public class PacmanAStar extends Controller<MOVE>
 {
 	final int MAX_DEPTH = 100;
 	private MOVE myMove=MOVE.NEUTRAL;
@@ -25,7 +25,7 @@ public class PacmanBFS extends Controller<MOVE>
 			TreeSearch graph = new TreeSearch();
 			graph.createGraph(game.getCurrentMaze().graph);
 
-			int[] bestPath = graph.computePathBFS(game.getPacmanCurrentNodeIndex(), game, MAX_DEPTH);
+			int[] bestPath = graph.computePathAStar(game.getPacmanCurrentNodeIndex(), game, MAX_DEPTH);
 			
 			if (bestPath.length > 0) {
 				for(int i = 1; i < bestPath.length; i++){

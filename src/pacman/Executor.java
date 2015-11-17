@@ -71,10 +71,13 @@ public class Executor
 //		exec.runGameTimed(new MyPacMan(),new StarterGhosts(),visual);
 
 		// Our Pacman Algorithms
-		exec.runGameTimed(new PacmanBFS(),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanBFS(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanDFS(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanIterativeDeepening(),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanAStar(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanHillclimber(),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanGatherData(new KeyBoardInput()),new StarterGhosts(),visual);
+		exec.runGameTimed(new PacmanKNearestNeighbor(),new StarterGhosts(),visual);
 
 		//*/
 
@@ -179,6 +182,8 @@ public class Executor
 
 		if(pacManController instanceof HumanController)
 			gv.getFrame().addKeyListener(((HumanController)pacManController).getKeyboardInput());
+		if(pacManController instanceof PacmanGatherData)
+			gv.getFrame().addKeyListener(((PacmanGatherData)pacManController).getKeyboardInput());
 
 		new Thread(pacManController).start();
 		new Thread(ghostController).start();
@@ -203,6 +208,10 @@ public class Executor
 	        	gv.repaint();
 		}
 
+		if (pacManController instanceof PacmanGatherData) {
+			((PacmanGatherData)pacManController).writeDataToFile();
+		}
+		
 		pacManController.terminate();
 		ghostController.terminate();
 	}
