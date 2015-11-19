@@ -1,5 +1,7 @@
 package pacman.game.internal;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 
 import pacman.Executor;
@@ -30,6 +32,7 @@ public class TreeNode implements Comparable<TreeNode>
 	    	Game game = this.gameState.copy();
 	    	game.advanceGame(move, Executor.ghostAI.getMove());
 	    	TreeNode next = new TreeNode(game);
+	    	next.parent = this;
 	    	return next;
 	    }
 	    
@@ -51,5 +54,23 @@ public class TreeNode implements Comparable<TreeNode>
 				return 1;
 			}
 			return 0;
+	    }
+	    
+	 // Function adapted from AStar.java
+		public static synchronized int[] extractPath(TreeNode target)
+	    {
+			ArrayList<Integer> route = new ArrayList<Integer>();
+			TreeNode current = target;
+			route.add(current.index);
+			while (current.parent != null) {
+				current = current.parent;
+				route.add(current.index);
+			}
+			Collections.reverse(route);
+			int[] routeArray=new int[route.size()];
+	        for(int i=0;i<routeArray.length;i++) {
+	        	routeArray[i]=route.get(i);
+	    	}
+	        return routeArray;
 	    }
 	}

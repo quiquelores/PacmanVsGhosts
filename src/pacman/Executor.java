@@ -77,8 +77,10 @@ public class Executor
 //		exec.runGameTimed(new PacmanAStar(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanHillclimber(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanGatherData(new KeyBoardInput()),new StarterGhosts(),visual);
-		exec.runGameTimed(new PacmanKNearestNeighbor(),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanKNearestNeighbor(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanSimulatedAnnealing(),new StarterGhosts(),visual);
+		
+		exec.runGameTimed(new PacmanEvolutionaryAlg(),new StarterGhosts(),visual);
 
 		//*/
 
