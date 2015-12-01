@@ -118,6 +118,7 @@ public class Executor
 
     	Random rnd=new Random(0);
 		Game game;
+		ghostAI = ghostController;
 
 		for(int i=0;i<trials;i++)
 		{
@@ -234,6 +235,8 @@ public class Executor
  		Game game=new Game(0);
 
  		GameView gv=null;
+		ghostAI = ghostController;
+
 
  		if(visual)
  			gv=new GameView(game).showGame();
@@ -295,6 +298,7 @@ public class Executor
 		StringBuilder replay=new StringBuilder();
 
 		Game game=new Game(0);
+		ghostAI = ghostController;
 
 		GameView gv=null;
 
