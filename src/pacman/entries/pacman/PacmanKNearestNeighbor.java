@@ -16,6 +16,10 @@ public class PacmanKNearestNeighbor extends Controller<MOVE>
 {
 	
 	public ArrayList<Integer[]> dataTable = new ArrayList<Integer[]>();
+	float[] axisWeights;
+	
+	final int NUM_TARGETS_AT_A_TIME = 20;
+	public ArrayList<Integer[]> nextTargets = new ArrayList<Integer[]>();
 	
 	public PacmanKNearestNeighbor() {
 		// Reading the training data
@@ -49,6 +53,13 @@ public class PacmanKNearestNeighbor extends Controller<MOVE>
         catch(IOException ex) {
             ex.printStackTrace();
         }
+		
+		axisWeights = new float[5];
+		axisWeights[0] = 0.20f; // Score
+		axisWeights[1] = 0.5f; // Distance to nearest active pill
+		axisWeights[2] = 0.0f; // Distance to nearest active power pill
+		axisWeights[3] = 5.0f; // Distance to nearest ghost
+		axisWeights[4] = 0.0f; // Edible time of nearest ghost
 	}
 	
 	public MOVE getMove(Game game, long timeDue)
@@ -56,8 +67,16 @@ public class PacmanKNearestNeighbor extends Controller<MOVE>
 		TreeSearch graph = new TreeSearch();
 		graph.createGraph(game.getCurrentMaze().graph);
 		
-		int[] features = PacmanGatherData.getFeatures(game);
-		int[] targetFeatures = getTargetFeatures(features, 1); // getTargetFeatures(features, k)
+		if (game.wasPacManEaten()) {
+			nextTargets = new ArrayList<Integer[]>();
+		}
+		
+		if (nextTargets.size() == 0) {
+			int[] features = PacmanGatherData.getFeatures(game);
+			nextTargets = getTargetFeatures(features, 1, NUM_TARGETS_AT_A_TIME); // getTargetFeatures(features, k, numTargetsToFetch)
+		}
+		
+		Integer[] targetFeatures = nextTargets.remove(0);
 		
 		HashMap<MOVE, Game> nextStates = graph.getImmediateNextGameStates(game.getPacmanCurrentNodeIndex(), game);
 		MOVE bestMove = MOVE.NEUTRAL;
@@ -79,7 +98,7 @@ public class PacmanKNearestNeighbor extends Controller<MOVE>
 	double getDistanceBetweenFeatures(int[] from, int[] to) {
 		double sum = 0;
 		for (int i = 0; i < from.length; ++i) {
-			sum += Math.pow(from[i] - to[i], 2);
+			sum += Math.pow(from[i] - to[i], 2) * axisWeights[i];
 		}
 		return Math.pow(sum, 0.5);
 	}
@@ -87,60 +106,81 @@ public class PacmanKNearestNeighbor extends Controller<MOVE>
 	double getDistanceBetweenFeatures(int[] from, Integer[] to) {
 		double sum = 0;
 		for (int i = 0; i < from.length; ++i) {
-			sum += Math.pow(from[i] - to[i], 2);
+			sum += Math.pow(from[i] - to[i], 2) * axisWeights[i];
 		}
 		return Math.pow(sum, 0.5);
 	}
 	
-	int[] getTargetFeatures(int[] currentFeatures, int k) {
+	ArrayList<Integer[]> getTargetFeatures(int[] currentFeatures, int k, int numTargetsToFetch) {
 		// Calculating the distances of each feature set from the currentFeatures
-		double[] distances = new double[dataTable.size()];
-		for (int i = 0; i < dataTable.size(); ++i) {
+		double[] distances = new double[dataTable.size() - numTargetsToFetch];
+		// used dataTable.size() - numTargetsToFetch because we need to find a point on the dataTable 
+		// that matches the current state and then follow the next numTargetsToFetch moves after it
+		for (int i = 0; i < distances.length; ++i) {
 			distances[i] = getDistanceBetweenFeatures(currentFeatures, dataTable.get(i));
 		}
 		// Getting the k closest features to currentFeatures
-		if (k > dataTable.size()) {
-			k = dataTable.size();
+		if (k > distances.length) {
+			k = distances.length;
 		}
 		ArrayList<Integer> mins = new ArrayList<Integer>();
-		for (int iteration = 0; iteration < k; ++iteration) {
+		for (int iteration = 0; iteration < k; ++iteration) { // Gets the indices of the k-closest features
 			double min = Double.MAX_VALUE;
 			int index = 0;
-			for (int i = 0; i < distances.length; ++i) {
+			for (int i = 0; i < distances.length; ++i) { 
+				if (mins.contains(i + 1)) {
+					continue; // Skips mins we've already counted before
+				}
 				if (distances[i] < min) {
 					min = distances[i];
 					index = i;
 				}
 			}
-			// If the min value found was not the last value in the training data, 
-			// the target should the step after that (ie. the move the human made from that state) 
-			if (index + 1 < distances.length) {
-				mins.add(index + 1);
-			}
-			else {
-				mins.add(index);
-			}
-			distances[index] = Double.MAX_VALUE;
+			mins.add(index + 1);
 		}
-		ArrayList<Integer[]> kClosestFeatureSets = new ArrayList<Integer[]>();
+		// Getting the weights of each feature set based on the distance to the current state
 		double[] weights = new double[k];
 		double totalDistance = 0;
 		for (int i = 0; i < mins.size(); ++i) {
 			totalDistance += distances[mins.get(i)];
 		}
 		for (int i = 0; i < mins.size(); ++i) {
-			kClosestFeatureSets.add(dataTable.get(mins.get(i)));
 			weights[i] = distances[mins.get(i)] / totalDistance;
 		}
 		// Getting the weighted average of the k feature sets
-		int[] targetFeatures = new int[currentFeatures.length];
-		for (int i = 0; i < targetFeatures.length; ++i) {
-			double sum = 0;
-			for (int j = 0; j < k; ++j) {
-				sum += kClosestFeatureSets.get(j)[i] * weights[j];
+		ArrayList<Integer[]> targets = new ArrayList<Integer[]>();
+		for (int targetIndex = 0; targetIndex < numTargetsToFetch; targetIndex++) {
+			ArrayList<Integer[]> kClosestFeatureSets = new ArrayList<Integer[]>();
+			for (int i = 0; i < mins.size(); ++i) {
+				//System.out.println(mins.get(i) + " + " + targetIndex + ": " + dataTable.size());
+				kClosestFeatureSets.add(dataTable.get(mins.get(i) + targetIndex));
 			}
-			targetFeatures[i] = (int)Math.round(sum);
+			Integer[] targetFeatures = new Integer[currentFeatures.length];
+			for (int i = 0; i < targetFeatures.length; ++i) {
+				double sum = 0;
+				for (int j = 0; j < k; ++j) {
+					sum += kClosestFeatureSets.get(j)[i] * weights[j];
+				}
+				targetFeatures[i] = (int)Math.round(sum);
+			}
+			targets.add(targetFeatures);
 		}
-		return targetFeatures;
+		
+		/*
+		String debugLine = "Current: ";
+		for (int i = 0; i < currentFeatures.length; ++i) {
+			debugLine += currentFeatures[i] + ",";
+		}
+		debugLine += "     Target: ";
+		for (int t = 0; t < numTargetsToFetch; ++t) {
+			for (int i = 0; i < currentFeatures.length; ++i) {
+				debugLine += targets.get(t)[i] + ",";
+			}
+			debugLine += "\n";
+		}
+		System.out.println(debugLine);
+		*/
+		
+		return targets;
 	}
 }

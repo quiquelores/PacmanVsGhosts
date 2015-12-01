@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 import pacman.game.Game;
+import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.controllers.Controller;
@@ -31,7 +32,7 @@ public class PacmanGatherData extends Controller<MOVE>
     
     public void writeDataToFile() {
     	try {
-    		FileWriter fileWriter = new FileWriter("trainingData.txt");
+    		FileWriter fileWriter = new FileWriter("trainingData.txt", true);
     		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
     		bufferedWriter.write(data);
     		bufferedWriter.close();
@@ -70,31 +71,31 @@ public class PacmanGatherData extends Controller<MOVE>
     	// Getting the Score
     	features.add(game.getScore());
     	
-    	// Getting the Manhattan distance to the nearest active pill
+    	// Getting the distance to the nearest active pill
     	int nearestPillDistance = Integer.MAX_VALUE;
     	for (int nodeIndex : game.getActivePillsIndices()) {
-    		int d = game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), nodeIndex);
+    		int d = (int)Math.round(game.getDistance(game.getPacmanCurrentNodeIndex(), nodeIndex, DM.PATH));
     		if (d < nearestPillDistance) {
     			nearestPillDistance = d;
     		}
     	}
     	features.add(nearestPillDistance);
     	
-    	// Getting the Manhattan distance to the nearest active power pill
+    	// Getting the distance to the nearest active power pill
     	int nearestPowerPillDistance = Integer.MAX_VALUE;
     	for (int nodeIndex : game.getActivePowerPillsIndices()) {
-    		int d = game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), nodeIndex);
+    		int d = (int)Math.round(game.getDistance(game.getPacmanCurrentNodeIndex(), nodeIndex, DM.PATH));
     		if (d < nearestPowerPillDistance) {
     			nearestPowerPillDistance = d;
     		}
     	}
     	features.add(nearestPowerPillDistance);
     	
-    	// Getting the Manhattan distance to the nearest ghost and its edibleTime
+    	// Getting the distance to the nearest ghost and its edibleTime
     	int nearestGhostDistance = Integer.MAX_VALUE;
     	int edibleTime = 0;
     	for (GHOST g : GHOST.values()) {
-    		int d = game.getManhattanDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(g));
+    		int d = (int)Math.round(game.getDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(g), DM.PATH));
     		if (d < nearestGhostDistance) {
     			nearestGhostDistance = d;
     			edibleTime = game.getGhostEdibleTime(g);
