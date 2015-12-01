@@ -80,7 +80,7 @@ public class TreeSearch {
 			}
 		}
 
-        return extractPath(current);
+        return TreeNode.extractPath(current);
     }
 	
 	
@@ -127,7 +127,7 @@ public class TreeSearch {
 		}
 
         if(foundSolution) {
-        	return extractPath(current);
+        	return TreeNode.extractPath(current);
         }
         else {
         	return new int[0];
@@ -185,7 +185,7 @@ public class TreeSearch {
 				}
 			}
 		}
-        return extractPath(current);
+        return TreeNode.extractPath(current);
     }
 	
 	
@@ -203,60 +203,6 @@ public class TreeSearch {
         return nextStates;
 	}
 	
-	// Function adapted from AStar.java
-	private synchronized int[] extractPath(TreeNode target)
-    {
-		ArrayList<Integer> route = new ArrayList<Integer>();
-		TreeNode current = target;
-		route.add(current.index);
-		while (current.parent != null) {
-			current = current.parent;
-			route.add(current.index);
-		}
-		Collections.reverse(route);
-		int[] routeArray=new int[route.size()];
-        for(int i=0;i<routeArray.length;i++) {
-        	routeArray[i]=route.get(i);
-    	}
-        return routeArray;
-    }
 	
-}
-
-
-//Class adapted from AStar.java
-class TreeNode implements Comparable<TreeNode>
-{
-	public Game gameState;
-	public int index;
-	public EnumMap<MOVE, TreeNode> neighbors = new EnumMap<MOVE, TreeNode>(MOVE.class);
-	public double g = 0;
-	public double h = 0;
-	public TreeNode parent = null;
-	public MOVE reachedBy = null;
-
-    public TreeNode(int index)
-    {
-        this.index=index;
-    }
-    
-    public double f() {
-    	return g + h;
-    }
-    
-    public boolean isEqual(TreeNode other)
-    {
-        return index == other.index;
-    }
-    
-    public int compareTo(TreeNode other)
-    {
-		if (f() < other.f()) {
-			return -1;
-		}
-		else if (f() > other.f()) {
-			return 1;
-		}
-		return 0;
-    }
+	
 }
