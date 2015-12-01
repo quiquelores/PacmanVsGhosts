@@ -26,13 +26,14 @@ public class TreeNode implements Comparable<TreeNode>
 	    public TreeNode(Game game){
 	    	this.gameState = game;
 	    	this.index = game.getPacmanCurrentNodeIndex();
-	    	this.reachedBy = game.getPacmanLastMoveMade();    	
+	    	this.reachedBy = game.getPacmanLastMoveMade();
 	    }
 	    public TreeNode evolve(MOVE move){
 	    	Game game = this.gameState.copy();
 	    	game.advanceGame(move, Executor.ghostAI.getMove());
 	    	TreeNode next = new TreeNode(game);
 	    	next.parent = this;
+	    	next.reachedBy = move;
 	    	return next;
 	    }
 	    

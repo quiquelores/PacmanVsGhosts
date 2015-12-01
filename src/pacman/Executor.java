@@ -80,7 +80,8 @@ public class Executor
 //		exec.runGameTimed(new PacmanKNearestNeighbor(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanSimulatedAnnealing(),new StarterGhosts(),visual);
 		
-		exec.runGameTimed(new PacmanEvolutionaryAlg(),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanEvolutionaryAlg(),new StarterGhosts(),visual);
+		exec.runGameTimed(new PacmanGeneticAlg(),new StarterGhosts(),visual);
 
 		//*/
 

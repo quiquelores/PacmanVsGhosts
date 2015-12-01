@@ -8,26 +8,20 @@ import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 import pacman.game.internal.*;
 
-public class PacmanEvolutionaryAlg extends Controller<MOVE> {
+public class PacmanGeneticAlg extends Controller<MOVE> {
 	private MOVE myMove = MOVE.NEUTRAL;
-	private int k = 8; // How many "best" offsprings do we keep on each
-						// iteration
 
 	public MOVE getMove(Game game, long timeDue) {
-
-		// @TODO: repeat the following process until what? we reach a winning
-		// state and/or our score doubles?
-
 		ArrayList<TreeNode> list = new ArrayList<TreeNode>();
 		ArrayList<TreeNode> helperList = new ArrayList<TreeNode>();
 		ArrayList<TreeNode> offspringList = new ArrayList<TreeNode>();
 
 		list.add(new TreeNode(game));
 
-		for (int a = 0; a < 32; a++) {
-			// iterate game finding all children nodes within 4 levels of
+		for (int a = 0; a < 4; a++) {
+			// iterate game finding all children nodes within 2 levels of
 			// depth.
-			for (int j = 0; j < 4; j++) {
+			for (int j = 0; j < 2; j++) {
 				for (int i = 0; i < list.size(); i++) {
 					TreeNode t = list.get(i);
 					MOVE[] possibleMoves = t.gameState.getPossibleMoves(t.gameState.getPacmanCurrentNodeIndex());
@@ -41,22 +35,20 @@ public class PacmanEvolutionaryAlg extends Controller<MOVE> {
 				helperList = new ArrayList<TreeNode>();
 			}
 
-			// sort by evaluation function? use treenodes instead? make them
-			// comparable
-			Collections.sort(offspringList, new StateComparator());
-
-			// remove n-k worst offsprings
-			for (int i = offspringList.size() - 1; i >= k; i--) {
-				offspringList.remove(k);
-			}
-
-			// mutate by moving to a random position near them
 			for (int m = 0; m < offspringList.size(); m++) {
-				MOVE[] moves = offspringList.get(m).gameState.getPossibleMoves(offspringList.get(m).gameState.getPacmanCurrentNodeIndex());
-				MOVE randomMOVE = moves[(int) (Math.random() * moves.length)];
-				TreeNode mutation = offspringList.get(m).evolve(randomMOVE);
-				helperList.add(mutation);
-				helperList.add(offspringList.get(m));
+				TreeNode x = offspringList.get((int) (Math.random()*offspringList.size()));
+				TreeNode y = offspringList.get((int)Math.random()*offspringList.size());
+
+				TreeNode crossoverChild = crossover(x,y);
+				if (Math.random() <= 0.05) {
+					// mutate by moving to a random position near them
+					MOVE[] moves = crossoverChild.gameState
+							.getPossibleMoves(crossoverChild.gameState.getPacmanCurrentNodeIndex());
+					MOVE randomMOVE = moves[(int) (Math.random() * moves.length)];
+					crossoverChild = crossoverChild.evolve(randomMOVE);
+				}
+				helperList.add(crossoverChild);
+
 			}
 			list = helperList;
 			helperList = new ArrayList<TreeNode>();
@@ -71,5 +63,26 @@ public class PacmanEvolutionaryAlg extends Controller<MOVE> {
 			myMove = game.getMoveToMakeToReachDirectNeighbour(game.getPacmanCurrentNodeIndex(), computedPath[1]);
 		}
 		return myMove;
+	}
+
+	//crossover by taking alternate 'moves' from t1's and t2's the last 40 moves
+	//return the TreeNode containing that game state
+	TreeNode crossover(TreeNode t1, TreeNode t2) {
+		ArrayList<MOVE> moves = new ArrayList<MOVE>();
+		int index = 0;
+		while(t1.parent != null && t2.parent != null && index < 40){
+			if (index % 2 == 0) {
+				moves.add(0, t2.reachedBy);
+			} else {
+				moves.add(0, t1.reachedBy);
+			}
+			t1 = t1.parent;
+			t2 = t2.parent;
+			index++;
+		}
+		while (!moves.isEmpty()) {
+			t2 = t2.evolve(moves.remove(0));
+		}
+		return t2;
 	}
 }
