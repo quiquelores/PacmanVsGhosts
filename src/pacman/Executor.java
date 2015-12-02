@@ -66,7 +66,7 @@ public class Executor
 		boolean visual=true;
 //		exec.runGameTimed(new NearestPillPacMan(),new AggressiveGhosts(),visual);
 //		exec.runGameTimed(new StarterPacMan(),new StarterGhosts(),visual);
-//		exec.runGameTimed(new HumanController(new KeyBoardInput()),new StarterGhosts(),visual);
+		exec.runGameTimed(new HumanController(new KeyBoardInput()),new StarterGhosts(),visual);
 //		exec.runGameTimed(new HumanController(new KeyBoardInput()),new MyGhosts(),visual);
 //		exec.runGameTimed(new MyPacMan(),new StarterGhosts(),visual);
 
@@ -74,12 +74,14 @@ public class Executor
 //		exec.runGameTimed(new PacmanBFS(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanDFS(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanIterativeDeepening(),new StarterGhosts(),visual);
-//		exec.runGameTimed(new PacmanAStar(),new StarterGhosts(),visual);
+		exec.runGameTimed(new PacmanAStar(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanHillclimber(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanGatherData(new KeyBoardInput()),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanKNearestNeighbor(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanSimulatedAnnealing(),new StarterGhosts(),visual);
-		
+//		exec.runGameTimed(new PacmanEvolutionaryAlg(),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanPerceptronGatherData(new KeyBoardInput()),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanPerceptron(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanEvolutionaryAlg(),new StarterGhosts(),visual);
 		exec.runGameTimed(new PacmanGeneticAlg(),new StarterGhosts(),visual);
 
@@ -187,8 +189,10 @@ public class Executor
 
 		if(pacManController instanceof HumanController)
 			gv.getFrame().addKeyListener(((HumanController)pacManController).getKeyboardInput());
-		if(pacManController instanceof PacmanGatherData)
+		else if(pacManController instanceof PacmanGatherData)
 			gv.getFrame().addKeyListener(((PacmanGatherData)pacManController).getKeyboardInput());
+		else if(pacManController instanceof PacmanPerceptronGatherData)
+			gv.getFrame().addKeyListener(((PacmanPerceptronGatherData)pacManController).getKeyboardInput());
 
 		new Thread(pacManController).start();
 		new Thread(ghostController).start();
@@ -215,6 +219,9 @@ public class Executor
 
 		if (pacManController instanceof PacmanGatherData) {
 			((PacmanGatherData)pacManController).writeDataToFile();
+		}
+		else if (pacManController instanceof PacmanPerceptronGatherData) {
+			((PacmanPerceptronGatherData)pacManController).writeDataToFile();
 		}
 		
 		pacManController.terminate();

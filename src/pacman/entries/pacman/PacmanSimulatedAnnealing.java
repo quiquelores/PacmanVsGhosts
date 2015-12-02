@@ -30,7 +30,6 @@ public class PacmanSimulatedAnnealing extends Controller<MOVE>
 			gameCopy.advanceGame(move, Executor.ghostAI.getMove());
 
 			int stateScore = StateEvaluator.evalGameState(gameCopy);
-			double time = gameCopy.getCurrentLevelTime();
 
 			if(stateScore>currBestEval){
 				myMove = move;
