@@ -22,6 +22,7 @@ import pacman.controllers.examples.RandomNonRevPacMan;
 import pacman.controllers.examples.RandomPacMan;
 import pacman.controllers.examples.StarterGhosts;
 import pacman.controllers.examples.StarterPacMan;
+import pacman.entries.ghosts.HillClimberGhosts;
 import pacman.entries.pacman.*;
 import pacman.game.Game;
 import pacman.game.GameView;
@@ -38,6 +39,8 @@ import static pacman.game.Constants.*;
 public class Executor
 {
 	public static Controller<EnumMap<GHOST,MOVE>> ghostAI;
+	public static Controller<MOVE> pacmanController;
+
 	
 	/**
 	 * The main method. Several options are listed - simply remove comments to use the option you want.
@@ -48,11 +51,11 @@ public class Executor
 	{
 		Executor exec=new Executor();
 
-		/*
+		
 		//run multiple games in batch mode - good for testing.
-		int numTrials=10;
-		exec.runExperiment(new RandomPacMan(),new RandomGhosts(),numTrials);
-		 */
+		//int numTrials=20;
+		//exec.runExperiment(new PacmanKNearestNeighbor(),new StarterGhosts(),numTrials);
+		 
 
 		/*
 		//run a game in synchronous mode: game waits until controllers respond.
@@ -66,7 +69,7 @@ public class Executor
 		boolean visual=true;
 //		exec.runGameTimed(new NearestPillPacMan(),new AggressiveGhosts(),visual);
 //		exec.runGameTimed(new StarterPacMan(),new StarterGhosts(),visual);
-		exec.runGameTimed(new HumanController(new KeyBoardInput()),new StarterGhosts(),visual);
+//		exec.runGameTimed(new HumanController(new KeyBoardInput()),new StarterGhosts(),visual);
 //		exec.runGameTimed(new HumanController(new KeyBoardInput()),new MyGhosts(),visual);
 //		exec.runGameTimed(new MyPacMan(),new StarterGhosts(),visual);
 
@@ -74,7 +77,7 @@ public class Executor
 //		exec.runGameTimed(new PacmanBFS(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanDFS(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanIterativeDeepening(),new StarterGhosts(),visual);
-		exec.runGameTimed(new PacmanAStar(),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanAStar(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanHillclimber(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanGatherData(new KeyBoardInput()),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanKNearestNeighbor(),new StarterGhosts(),visual);
@@ -83,7 +86,10 @@ public class Executor
 //		exec.runGameTimed(new PacmanPerceptronGatherData(new KeyBoardInput()),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanPerceptron(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanEvolutionaryAlg(),new StarterGhosts(),visual);
-		exec.runGameTimed(new PacmanGeneticAlg(),new StarterGhosts(),visual);
+//		exec.runGameTimed(new PacmanGeneticAlg(),new StarterGhosts(),visual);
+		
+		exec.runGameTimed(new PacmanAStar(),new HillClimberGhosts(),visual);
+
 
 		//*/
 
@@ -121,6 +127,7 @@ public class Executor
     	Random rnd=new Random(0);
 		Game game;
 		ghostAI = ghostController;
+		pacmanController = pacManController;
 
 		for(int i=0;i<trials;i++)
 		{
@@ -181,6 +188,7 @@ public class Executor
 	{
 		Game game=new Game(0);
 		ghostAI = ghostController;
+		pacmanController = pacManController;
 
 		GameView gv=null;
 
@@ -243,6 +251,7 @@ public class Executor
 
  		GameView gv=null;
 		ghostAI = ghostController;
+		pacmanController = pacManController;
 
 
  		if(visual)
@@ -306,6 +315,7 @@ public class Executor
 
 		Game game=new Game(0);
 		ghostAI = ghostController;
+		pacmanController = pacManController;
 
 		GameView gv=null;
 
