@@ -56,9 +56,9 @@ public class Executor
 		//run multiple games in batch mode - good for testing.
 		int numTrials=20;
 		//exec.runExperiment(new PacmanKNearestNeighbor(),new StarterGhosts(),numTrials);
-		exec.runExperiment(new StarterPacMan(),new StarterGhosts(),numTrials);
-		exec.runExperiment(new StarterPacMan(),new HillClimberGhosts(),numTrials);
-		exec.runExperiment(new StarterPacMan(),new BFSGhosts(),numTrials);
+//		exec.runExperiment(new StarterPacMan(),new StarterGhosts(),numTrials);
+//		exec.runExperiment(new StarterPacMan(),new HillClimberGhosts(),numTrials);
+//		exec.runExperiment(new StarterPacMan(),new BFSGhosts(),numTrials);
 
 
 		/*
@@ -94,7 +94,7 @@ public class Executor
 		
 //		exec.runGameTimed(new StarterPacMan(),new HillClimberGhosts(),visual);
 //		exec.runGameTimed(new StarterPacMan(),new AStarGhosts(),visual);
-//		exec.runGameTimed(new PacmanID3(),new StarterGhosts(),visual);
+		exec.runGameTimed(new PacmanID3(),new StarterGhosts(),visual);
 
 
 		//*/
