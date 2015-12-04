@@ -34,7 +34,7 @@ public class PacmanSimulatedAnnealing extends Controller<MOVE>
 			if(stateScore>currBestEval){
 				myMove = move;
 				currBestEval = stateScore;
-			} else if(stateScore != Integer.MIN_VALUE && stateScore != currBestEval && Math.random() <= Math.exp(((stateScore-currBestEval)/10*(game.getScore())))){
+			} else if(stateScore != Integer.MIN_VALUE && stateScore != currBestEval && Math.random() <= Math.exp((((float)(stateScore-currBestEval))/10f*((float)game.getScore())))){
 				myMove = move;
 				currBestEval = stateScore;
 			}

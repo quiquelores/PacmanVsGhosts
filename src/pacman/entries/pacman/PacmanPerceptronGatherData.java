@@ -153,7 +153,7 @@ public class PacmanPerceptronGatherData extends Controller<MOVE>
     	int edibleTime = 0;
     	for (GHOST g : GHOST.values()) {
     		int d = (int)Math.round(game.getDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(g), DM.PATH));
-    		if (d < nearestGhostDistance) {
+    		if (d >= 0 && d < nearestGhostDistance) {
     			nearestGhostDistance = d;
     			edibleTime = game.getGhostEdibleTime(g);
     		}

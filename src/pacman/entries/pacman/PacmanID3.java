@@ -7,30 +7,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 
+import pacman.Executor;
 import pacman.controllers.Controller;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.internal.TreeSearch;
+import pacman.game.internal.ID3TreeNode;
 import pacman.game.Game;
 
-public class PacmanPerceptron extends Controller<MOVE>
+public class PacmanID3 extends Controller<MOVE>
 {
 	
-	float[] featureWeights;
+	ID3TreeNode root;
 	
-	public PacmanPerceptron() {
-		// Initializing the weights
-		featureWeights = new float[5];
-		featureWeights[0] = 0.01f; // Score
-		featureWeights[1] = 0.01f; // Distance to nearest active pill
-		featureWeights[2] = 0.01f; // Distance to nearest active power pill
-		featureWeights[3] = 0.01f; // Distance to nearest ghost
-		featureWeights[4] = 0.01f; // Edible time of nearest ghost
-		
+	public PacmanID3() {
 		// Initializing the training data
-		ArrayList<float[]> inputVectors = new ArrayList<float[]>();
-		ArrayList<Float> desiredOutputs = new ArrayList<Float>();
+		ArrayList<float[]> data = new ArrayList<float[]>();
 		// Reading the training data
 		try {
 			FileReader fileReader = new FileReader("perceptronTrainingData.txt");
@@ -47,21 +40,11 @@ public class PacmanPerceptron extends Controller<MOVE>
 						}
 					}
 					
-					/*
-					float[] rowArray = new float[rowInfo.size() - 1];
+					float[] rowArray = new float[rowInfo.size()];
 					for (int i = 0; i < rowArray.length; ++i) {
 						rowArray[i] = rowInfo.get(i);
 					}
-					*/
-					
-					float[] rowArray = new float[rowInfo.size()];
-					rowArray[0] = 1f;
-					for (int i = 0; i < rowArray.length - 1; ++i) {
-						rowArray[i + 1] = rowInfo.get(i);
-					}
-					
-					inputVectors.add(rowArray);
-					desiredOutputs.add(rowInfo.get(rowInfo.size() - 1));
+					data.add(rowArray);
 				}
 			}   
 			bufferedReader.close(); 
@@ -73,50 +56,27 @@ public class PacmanPerceptron extends Controller<MOVE>
 			ex.printStackTrace();
 		}
 		
+		// Creating the decision tree based on the training data
+		ArrayList<Integer> splitFeatures = new ArrayList<Integer>();
+		splitFeatures.add(1); // Nearest pill attribute
+		splitFeatures.add(2); // Nearest power pill attribute
+		splitFeatures.add(3); // Nearest ghost attribute
+		splitFeatures.add(4); // Nearest ghost's edible time attribute
+		root = ID3TreeNode.buildTree(data, splitFeatures);
 		
-		// Setting the learning rate
-		float alpha = 0.01f;
-		
-		// Learning from the training data
-		for (int i = 0; i < inputVectors.size(); ++i) {
-			float[] x = inputVectors.get(i);
-			Float d = desiredOutputs.get(i);
-			// Calculating the actual output
-			float y = 0;
-			for (int j = 0; j < featureWeights.length; ++j) {
-				y += featureWeights[j] * x[j];
-			}
-			// Updating the weights
-			for (int j = 0; j < featureWeights.length; ++j) {
-				featureWeights[j] += alpha * (d - y) * x[j];
-			}
-		}
 	}
 
 	public MOVE getMove(Game game, long timeDue)
 	{
-		MOVE move = MOVE.NEUTRAL;
-		
 		int[] currentFeaturesAsInts = PacmanPerceptronGatherData.getFeatures(game);
-		
-		/*
 		float[] currentFeatures = new float[currentFeaturesAsInts.length];
         for(int i = 0; i < currentFeatures.length; i++) {
         	currentFeatures[i] = currentFeaturesAsInts[i];
     	}
-        */
-		
-		float[] currentFeatures = new float[currentFeaturesAsInts.length + 1];
-        for(int i = 0; i < currentFeaturesAsInts.length; i++) {
-        	currentFeatures[i + 1] = currentFeaturesAsInts[i];
-    	}
         
-		float output = 0;
-		for (int j = 0; j < featureWeights.length; ++j) {
-			output += featureWeights[j] * currentFeatures[j];
-		}
-		
-		if (output > 0) {
+        MOVE move = MOVE.NEUTRAL;
+        int output = root.classify(currentFeatures);
+        if (output > 0) {
 			// Move towards nearest pill
 			int nearestPillDistance = Integer.MAX_VALUE;
 			int nearestPillNodeIndex = 0;
@@ -140,7 +100,10 @@ public class PacmanPerceptron extends Controller<MOVE>
 	    			nearestGhost = g;
 	    		}
 	    	}
-			move = game.getNextMoveAwayFromTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(nearestGhost), DM.PATH);
+	    	
+	    	move = game.getNextMoveAwayFromTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(nearestGhost), DM.PATH);
+	    	//move = game.getApproximateNextMoveAwayFromTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(nearestGhost), game.getPacmanLastMoveMade(), DM.PATH);
+	    	
 		}
 		return move;
 	}
