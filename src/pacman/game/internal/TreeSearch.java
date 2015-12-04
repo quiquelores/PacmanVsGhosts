@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 import pacman.game.Game;
 import pacman.Executor;
 import pacman.game.Constants.DM;
+import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 
 
@@ -187,6 +188,54 @@ public class TreeSearch {
 		}
         return TreeNode.extractPath(current);
     }
+	
+	
+	/// METHODS USED BY GHOST CONTROLLERS
+	
+		public synchronized int[] computeGhostPathBFS(int s, Game game, int depth, GHOST ghost)
+	    {
+			ArrayList<TreeNode> open = new ArrayList<TreeNode>();
+			ArrayList<TreeNode> closed = new ArrayList<TreeNode>();
+			TreeNode start = graph[s];
+			start.gameState = game.copy();
+			start.reachedBy = MOVE.NEUTRAL;
+			open.add(start);
+			TreeNode current = null;
+			EnumMap<GHOST,MOVE> myMoves = new EnumMap<GHOST,MOVE>(GHOST.class);
+			
+			while (!open.isEmpty()) {
+				
+				current = open.remove(0);
+				closed.add(current);
+				
+				if (current.gameState.wasPacManEaten()) {
+					break;
+				}
+				
+				for (MOVE move : current.neighbors.keySet()) {
+					if(move != current.reachedBy.opposite()) {
+						TreeNode child = current.neighbors.get(move);
+						if (closed.contains(child)) {
+							continue;
+						}
+						child.g = current.g + 1;
+						if(child.g < depth){
+							child.parent = current;
+							child.reachedBy = move;
+							Game gameState = current.gameState.copy();
+							myMoves.put(ghost, move);
+							gameState.advanceGame(Executor.pacmanController.getMove(), myMoves);
+							child.gameState = gameState;
+							open.add(child);
+							
+						}
+					}
+				}
+			}
+
+	        return TreeNode.extractPath(current);
+	    }
+		
 	
 	
 	public synchronized HashMap<MOVE, Game> getImmediateNextGameStates(int s, Game game)

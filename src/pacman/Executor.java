@@ -22,6 +22,7 @@ import pacman.controllers.examples.RandomNonRevPacMan;
 import pacman.controllers.examples.RandomPacMan;
 import pacman.controllers.examples.StarterGhosts;
 import pacman.controllers.examples.StarterPacMan;
+import pacman.entries.ghosts.BFSGhosts;
 import pacman.entries.ghosts.HillClimberGhosts;
 import pacman.entries.pacman.*;
 import pacman.game.Game;
@@ -53,9 +54,12 @@ public class Executor
 
 		
 		//run multiple games in batch mode - good for testing.
-		//int numTrials=20;
+		int numTrials=20;
 		//exec.runExperiment(new PacmanKNearestNeighbor(),new StarterGhosts(),numTrials);
-		 
+		exec.runExperiment(new StarterPacMan(),new StarterGhosts(),numTrials);
+		exec.runExperiment(new StarterPacMan(),new HillClimberGhosts(),numTrials);
+		exec.runExperiment(new StarterPacMan(),new BFSGhosts(),numTrials);
+
 
 		/*
 		//run a game in synchronous mode: game waits until controllers respond.
@@ -88,7 +92,8 @@ public class Executor
 //		exec.runGameTimed(new PacmanEvolutionaryAlg(),new StarterGhosts(),visual);
 //		exec.runGameTimed(new PacmanGeneticAlg(),new StarterGhosts(),visual);
 		
-		exec.runGameTimed(new PacmanAStar(),new HillClimberGhosts(),visual);
+//		exec.runGameTimed(new StarterPacMan(),new HillClimberGhosts(),visual);
+//		exec.runGameTimed(new StarterPacMan(),new AStarGhosts(),visual);
 
 
 		//*/

@@ -20,29 +20,31 @@ public final class HillClimberGhosts extends Controller<EnumMap<GHOST,MOVE>>
 	
 	public EnumMap<GHOST,MOVE> getMove(Game game,long timeDue)
 	{
+		ArrayList<EnumMap<GHOST, MOVE>> possibleMoves = new ArrayList<EnumMap<GHOST, MOVE>>();
+		myMoves.clear();
+		
 		for(GHOST ghost : GHOST.values())	//for each ghost
-		{			
-			if(game.doesGhostRequireAction(ghost))		//if ghost requires an action
-			{
-				int currWorstEval = Integer.MAX_VALUE;
-				MOVE myMove = MOVE.NEUTRAL;
-
-				MOVE[] possibleMoves = game.getPossibleMoves(game.getPacmanCurrentNodeIndex());
-				for(MOVE move : possibleMoves){
-
-					Game gameCopy = game.copy();
-					EnumMap<GHOST,MOVE> myMovesCopy=myMoves.clone();
-					myMovesCopy.put(ghost, move);
-					gameCopy.advanceGame(Executor.pacmanController.getMove(), myMovesCopy);
-
-					if(StateEvaluator.evalGameState(gameCopy)<currWorstEval){
-						myMove = move;
-						currWorstEval = StateEvaluator.evalGameState(gameCopy);
-					}
-				}
-				myMoves.put(ghost, myMove);
+		{	
+			EnumMap<GHOST,MOVE> myMovesCopy=myMoves.clone();
+			for(MOVE move : game.getPossibleMoves(game.getGhostCurrentNodeIndex(ghost))){
+				myMovesCopy.put(ghost, move);
 			}
+			possibleMoves.add(myMovesCopy);
 		}
+		
+		int currWorstEval = Integer.MAX_VALUE;
+		int currBestMoves = -1;
+		for(int i = 1; i < possibleMoves.size(); i++){
+			Game gameCopy = game.copy();
+			gameCopy.advanceGame(Executor.pacmanController.getMove(), possibleMoves.get(i));
+			if(StateEvaluator.evalGameState(gameCopy) < currWorstEval){
+				currBestMoves = i;
+				currWorstEval = StateEvaluator.evalGameState(gameCopy);
+			}	
+		}	
+		if(possibleMoves.size()>0 && currBestMoves != -1)
+			return possibleMoves.get(currBestMoves);
+		
 		return myMoves;
 	}
 }
