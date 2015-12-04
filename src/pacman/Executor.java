@@ -94,6 +94,7 @@ public class Executor
 		
 //		exec.runGameTimed(new StarterPacMan(),new HillClimberGhosts(),visual);
 //		exec.runGameTimed(new StarterPacMan(),new AStarGhosts(),visual);
+//		exec.runGameTimed(new PacmanID3(),new StarterGhosts(),visual);
 
 
 		//*/
